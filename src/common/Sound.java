@@ -19,8 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
 import logging.Logging;
 
 import javax.swing.*;
@@ -32,8 +30,8 @@ public class Sound extends Application {
 
 	public static JFXPanel fxPanel;
 	public static JFrame frame;
-	public static MediaPlayer mediaPlayer;
-
+	private static MediaPlayer mediaPlayer;
+        private static boolean PLAYING=false;
 	static {
 		frame = new JFrame("sound");
 		fxPanel = new JFXPanel();
@@ -45,14 +43,27 @@ public class Sound extends Application {
 		fxPanel.setScene(new Scene(layout, 80, 60));
 
 	}
+        
+        
 
 	public static void playMp3(String fileName) throws IOException {
 		try {
 			String bip = Paths.get(fileName).toUri().toString();
-			Logging.log("media file: " + bip);
+			Logging.log("Media start: " + bip);
 				Media hit = new Media(bip);
-				mediaPlayer = new MediaPlayer(hit);
-				mediaPlayer.play();
+				setMediaPlayer(new MediaPlayer(hit));
+                                getMediaPlayer().setOnEndOfMedia(new Runnable() {
+                                    @Override public void run() {
+                                       PLAYING=false; 
+                                       Logging.log("Media ended: "+bip);
+                                        
+                                    }
+                                });
+                                PLAYING=true; 
+				getMediaPlayer().play();
+                                while(PLAYING){
+                                    Thread.sleep(10);
+                                }
 		}catch (Exception e){
 			Logging.log(e);
 		}
@@ -70,6 +81,20 @@ public class Sound extends Application {
 		}*/
 		
 	}
+
+    /**
+     * @return the mediaPlayer
+     */
+    public static MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    /**
+     * @param aMediaPlayer the mediaPlayer to set
+     */
+    public static void setMediaPlayer(MediaPlayer aMediaPlayer) {
+        mediaPlayer = aMediaPlayer;
+    }
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
