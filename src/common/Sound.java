@@ -33,6 +33,7 @@ public class Sound extends Application {
 	public static JFrame frame;
 	private static MediaPlayer mediaPlayer;
         private static boolean PLAYING=false;
+        private static String currentFile;
 	static {
 		frame = new JFrame("sound");
 		fxPanel = new JFXPanel();
@@ -47,10 +48,11 @@ public class Sound extends Application {
         
         
 
-	public static void playMp3(String fileName) throws IOException {
+	public static void playMp3(String fileName) throws IOException, Exception {
 		try {
 			String bip = Paths.get(fileName).toUri().toString();
 			Logging.log("Media start: " + bip);
+                        setCurrentFile(bip);
 				Media hit = new Media(bip);
 				setMediaPlayer(new MediaPlayer(hit));
                                 //getMediaPlayer().
@@ -65,6 +67,10 @@ public class Sound extends Application {
                                     @Override public void run() {
                                        setPLAYING(false); 
                                        Logging.log("MediaPlayer Error : ");
+                                       //if (new File(getCurrentFile()).delete()){
+                                         //  Logging.log("Deleted: "+getCurrentFile());
+                                       //};
+                                       
                                        Logging.log(getMediaPlayer().getError());
                                     }
                                 }
@@ -88,6 +94,7 @@ public class Sound extends Application {
                                 }
 		}catch (Exception e){
 			Logging.log(e);
+                        throw e;
 		}
 
 
@@ -132,6 +139,20 @@ public class Sound extends Application {
         PLAYING = aPLAYING;
     }
 
+    /**
+     * @return the currentFile
+     */
+    public static String getCurrentFile() {
+        return currentFile;
+    }
+
+    /**
+     * @param aCurrentFile the currentFile to set
+     */
+    public static void setCurrentFile(String aCurrentFile) {
+        currentFile = aCurrentFile;
+    }
+
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -140,10 +161,12 @@ public class Sound extends Application {
 		primaryStage.show();
 	}
 	public static void main(String [] args){
-		try {
-			playMp3("D:\\001001.mp3");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+                    try {
+                        playMp3("D:\\001001.mp3");
+                    } catch (Exception ex) {
+                        Logger.getLogger(Sound.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+		
 	}
 }
