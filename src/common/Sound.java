@@ -24,6 +24,7 @@ import logging.Logging;
 import javax.swing.*;
 
 import static java.nio.file.Paths.get;
+import javafx.util.Duration;
 import static logging.Logging.*;
 
 public class Sound extends Application {
@@ -52,16 +53,37 @@ public class Sound extends Application {
 			Logging.log("Media start: " + bip);
 				Media hit = new Media(bip);
 				setMediaPlayer(new MediaPlayer(hit));
+                                //getMediaPlayer().
                                 getMediaPlayer().setOnEndOfMedia(new Runnable() {
                                     @Override public void run() {
-                                       PLAYING=false; 
+                                       setPLAYING(false); 
                                        Logging.log("Media ended: "+bip);
                                         
                                     }
                                 });
-                                PLAYING=true; 
+                                getMediaPlayer().setOnError(new Runnable() {
+                                    @Override public void run() {
+                                       setPLAYING(false); 
+                                       Logging.log("MediaPlayer Error : ");
+                                       Logging.log(getMediaPlayer().getError());
+                                    }
+                                }
+                                );
+                                getMediaPlayer().setOnHalted(new Runnable() {
+                                    @Override public void run() {
+                                       setPLAYING(false); 
+                                       Logging.log("MediaPlayer Halted : ");
+                                       Logging.log(getMediaPlayer().getError());
+                                    }
+                                }
+                                );
+                                setPLAYING(true); 
+                                //Duration duration=getMediaPlayer().getCycleDuration();
 				getMediaPlayer().play();
-                                while(PLAYING){
+                                //Thread.sleep((long) (duration.toMillis()-1000));
+                                //Logging.log("Duration-1000 reached : "+duration+" ms.");
+                                //PLAYING=false;
+                                while(isPLAYING()){
                                     Thread.sleep(10);
                                 }
 		}catch (Exception e){
@@ -94,6 +116,20 @@ public class Sound extends Application {
      */
     public static void setMediaPlayer(MediaPlayer aMediaPlayer) {
         mediaPlayer = aMediaPlayer;
+    }
+
+    /**
+     * @return the PLAYING
+     */
+    public static boolean isPLAYING() {
+        return PLAYING;
+    }
+
+    /**
+     * @param aPLAYING the PLAYING to set
+     */
+    public static void setPLAYING(boolean aPLAYING) {
+        PLAYING = aPLAYING;
     }
 
 	@Override
